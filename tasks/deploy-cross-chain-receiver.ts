@@ -27,20 +27,20 @@ task(
         : hre.config.defaultNetwork;
       const routerAddress = taskArguments.router
         ? taskArguments.router
-        : getRouterConfig(hre.network.name).address;
+        : getRouterConfig(networkName).address;
       const usdcAddress = taskArguments.usdcToken
         ? taskArguments.usdcToken
-        : USDC_ADDRESSES[hre.network.name];
+        : USDC_ADDRESSES[networkName];
 
       const privateKey = getPrivateKey();
-      const rpcProviderUrl = getProviderRpcUrl(hre.network.name);
+      const rpcProviderUrl = getProviderRpcUrl(networkName);
       const provider = new JsonRpcProvider(rpcProviderUrl);
       const wallet = new Wallet(privateKey);
       const deployer = wallet.connect(provider);
       const spinner: Spinner = new Spinner();
 
       console.log(
-        `ℹ️  Attempting to deploy CrossChainReceiver on the ${hre.network.name} blockchain using ${deployer.address} address.`
+        `ℹ️  Attempting to deploy CrossChainReceiver on the ${networkName} blockchain using ${deployer.address} address.`
       );
       spinner.start();
 
@@ -55,17 +55,17 @@ task(
 
       spinner.stop();
       console.log(
-        `✅ CrossChainReceiver deployed at address ${crossChainReceiverAddress} on ${hre.network.name} blockchain`
+        `✅ CrossChainReceiver deployed at address ${crossChainReceiverAddress} on ${networkName} blockchain`
       );
 
       const filePath = join(
         __deploymentsPath,
-        `${hre.network.name}-CrossChainReceiver.json`
+        `${networkName}-CrossChainReceiver.json`
       );
       !existsSync(__deploymentsPath) && mkdirSync(__deploymentsPath);
       try {
         const data = {
-          network: hre.network.name,
+          network: networkName,
           crossChainReceiver: crossChainReceiverAddress,
         };
         writeFileSync(filePath, JSON.stringify(data));

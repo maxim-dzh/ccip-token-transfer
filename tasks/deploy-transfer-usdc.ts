@@ -22,18 +22,21 @@ task(`deploy-transfer-usdc`, `Deploys the TransferUSDC smart contract`)
   .addOptionalParam(`usdc`, `The address of the USDC token`)
   .setAction(
     async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
+      const networkName = hre.network.name
+        ? hre.network.name
+        : hre.config.defaultNetwork;
       const routerAddress = taskArguments.router
         ? taskArguments.router
-        : getRouterConfig(hre.network.name).address;
+        : getRouterConfig(networkName).address;
       const linkAddress = taskArguments.link
         ? taskArguments.link
-        : LINK_ADDRESSES[hre.network.name];
+        : LINK_ADDRESSES[networkName];
       const usdcAddress = taskArguments.usdc
         ? taskArguments.usdc
-        : USDC_ADDRESSES[hre.network.name];
+        : USDC_ADDRESSES[networkName];
 
       const privateKey = getPrivateKey();
-      const rpcProviderUrl = getProviderRpcUrl(hre.network.name);
+      const rpcProviderUrl = getProviderRpcUrl(networkName);
       const provider = new JsonRpcProvider(rpcProviderUrl);
       const wallet = new Wallet(privateKey);
       const deployer = wallet.connect(provider);
@@ -41,7 +44,7 @@ task(`deploy-transfer-usdc`, `Deploys the TransferUSDC smart contract`)
       const spinner: Spinner = new Spinner();
 
       console.log(
-        `ℹ️  Attempting to deploy TransferUSDC on the ${hre.network.name} blockchain using ${deployer.address} address, with the Router address ${routerAddress}, LINK address ${linkAddress} and USDC address ${usdcAddress} provided as constructor arguments`
+        `ℹ️  Attempting to deploy TransferUSDC on the ${networkName} blockchain using ${deployer.address} address, with the Router address ${routerAddress}, LINK address ${linkAddress} and USDC address ${usdcAddress} provided as constructor arguments`
       );
       spinner.start();
 
@@ -59,14 +62,14 @@ task(`deploy-transfer-usdc`, `Deploys the TransferUSDC smart contract`)
 
       spinner.stop();
       console.log(
-        `✅ TransferUSDC deployed at address ${transferUSDCAddress} on ${hre.network.name} blockchain`
+        `✅ TransferUSDC deployed at address ${transferUSDCAddress} on ${networkName} blockchain`
       );
 
-      const filePath = join(__deploymentsPath, `${hre.network.name}.json`);
+      const filePath = join(__deploymentsPath, `${networkName}.json`);
       !existsSync(__deploymentsPath) && mkdirSync(__deploymentsPath);
       try {
         const data = {
-          network: hre.network.name,
+          network: networkName,
           transferUsdc: transferUSDCAddress,
         };
         writeFileSync(filePath, JSON.stringify(data));

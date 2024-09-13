@@ -75,7 +75,6 @@ contract TransferUSDC is OwnerIsCreator {
             receiver: abi.encode(_receiver),
             data: "",
             tokenAmounts: tokenAmounts,
-            // tokenAmounts: new Client.EVMTokenAmount[](0), // Empty array as no tokens are transferred
             extraArgs: Client._argsToBytes(
                 Client.EVMExtraArgsV1({gasLimit: _gasLimit})
             ),
